@@ -7,6 +7,7 @@ def generate_sodoku(size=30):
 
     board = np.zeros(shape=(9,9))
     p_board = [[set() for x in range(9)] for y in range(9)]
+    next_cells = set()
 
     # Fill in a random cell
     cell = randint(0, 80)
@@ -30,12 +31,14 @@ def generate_sodoku(size=30):
                 pass
             else:
                 p_board[row][index].add(value)
+                next_cells.add(index_to_cell(row, index))
                 
             # Columns
             if p_board[index][col] == -1:
                 pass
             else:
                 p_board[index][col].add(value)
+                next_cells.add(index_to_cell(index, col))
 
         # Fill in the square pencil cells
         n = 27*floor(square/3) + (square%3) * 3
@@ -48,20 +51,19 @@ def generate_sodoku(size=30):
                 pass
             else:
                 p_board[c[0]][c[1]].add(value)
+                next_cells.add(s_cell)
                 
-        # Fill in a random pencilled in cell
-        c = cell_to_index(cell)
-        while True:
-            if type(p_board[c[0]][c[1]]) == set:
-                vals = {x for x in range(1,10)} - p_board[c[0]][c[1]]
-                value = choice(list(vals))
-                break
-            else:
-                cell = randint(0,80)
-                c = cell_to_index(cell)
+        # Fill in a random pencilled in cell  
+        cell = choice(list(next_cells))
 
+        c = cell_to_index(cell)
+        vals = {x for x in range(1,10)} - p_board[c[0]][c[1]]
+        value = choice(list(vals))
+
+        # Append the new value to the board
         board[c] = value
         p_board[c[0]][c[1]] = -1
+        next_cells.remove(cell)
 
     return board
         
@@ -79,3 +81,6 @@ def get_cell_stats(cell):
 
 def cell_to_index(cell):
     return(floor(cell/9), cell%9)
+
+def index_to_cell(row, col):
+    return np.arange(81).reshape((9,9))[row, col]
