@@ -6,7 +6,6 @@ from generator import *
 
 def solver(sodoku):
     
-    # Use a back-tracking algorithm to solve the sodoku
     solving = True
     
     # Set the solutions dictionary
@@ -23,15 +22,19 @@ def solver(sodoku):
                 if not(found_first_cell):
                     cell = index_to_cell(i, j)
                     square = get_cell_stats(cell)[2]
-                    found_first_cell = True           
+                    found_first_cell = True
+    
+    # Make a list of all tried solutions
+    burned = set()
     
     # Loop until a valid solution is found
     while solving:
 
         square = get_cell_stats(cell)[2]
         
-        # Populate the solutions if there aren't any
-        if len(solutions[cell]) == 0:
+        # Populate the solutions if we've reached a new anchor point
+        if cell not in burned:
+            
             taken = set()
             c = cell_to_index(cell)
             
@@ -53,6 +56,12 @@ def solver(sodoku):
 
             # Add the solutions to the dictionary
             solutions[cell] = {x for x in range(1, 10)} - taken
+            
+            # Refresh the burned set
+            burned = {x if x <= cell else -1 for x in burned}
+            
+            # Add the new cell to the burned solutions
+            burned.add(cell)
 
         # Check if any solutions exist for that square
         if len(solutions[cell]) == 0:
@@ -62,8 +71,11 @@ def solver(sodoku):
             # 1. Clear the cell since the solution is invalid
             c = cell_to_index(cell)
             sodoku[c[0]][c[1]] = 0
-
-            # 2. Go back to the previous cell containing solutions
+            
+            # 2. Remove the cell from the burned set
+            burned.remove(cell)
+            
+            # 3. Go back to the previous cell
             ind = list(solutions.keys()).index(cell) - 1
             cell = list(solutions.keys())[ind]
             
@@ -75,16 +87,18 @@ def solver(sodoku):
             c = cell_to_index(cell)
             sodoku[c[0]][c[1]] = list(solutions[cell])[0]
             
-            # 2. Break if we are at the last cell
-            if cell == 80:
-                solving = False
-                break
-            
-            # 3. Clear the solution from the set
+            # 2. Clear the solution from the set
             solutions[cell].pop()
             
-            # 4. Find the next empty cell
-            ind = list(solutions.keys()).index(cell) + 1
-            cell = list(solutions.keys())[ind]
+            if cell == 80:
+                
+                # 3. Break if we are at the last cell
+                solving = False
+            
+            else:
+                
+                # 4. Find the next empty cell
+                ind = list(solutions.keys()).index(cell) + 1
+                cell = list(solutions.keys())[ind]
         
     return sodoku
