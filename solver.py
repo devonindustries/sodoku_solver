@@ -1,4 +1,3 @@
-from webbrowser import get
 import numpy as np
 from random import *
 from math import *
@@ -24,7 +23,7 @@ def solver(sodoku):
                     square = get_cell_stats(cell)[2]
                     found_first_cell = True
     
-    # Make a list of all tried solutions
+    # Make a set of all tried solutions
     burned = set()
     
     # Loop until a valid solution is found
@@ -90,15 +89,16 @@ def solver(sodoku):
             # 2. Clear the solution from the set
             solutions[cell].pop()
             
-            if cell == 80:
-                
-                # 3. Break if we are at the last cell
-                solving = False
+            # 3. Find the next empty cell
+            ind = list(solutions.keys()).index(cell) + 1
             
-            else:
+            # 4. Terminate if at the last cell, and continue otherwise
+            if ind == len(solutions):
                 
-                # 4. Find the next empty cell
-                ind = list(solutions.keys()).index(cell) + 1
+                solving = False
+                
+            else:
+            
                 cell = list(solutions.keys())[ind]
         
     return sodoku
