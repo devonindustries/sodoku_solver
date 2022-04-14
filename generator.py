@@ -2,7 +2,7 @@ import numpy as np
 from random import *
 from math import *
 
-# Generate a sodoku with default 20 numbers to begin with
+# Generate a sodoku with default 30 numbers to begin with
 def generate_sodoku(size=30):
 
     board = np.zeros(shape=(9,9))

@@ -3,6 +3,7 @@ from random import *
 from math import *
 from generator import *
 
+# Solve a sodoku
 def solver(sodoku):
     
     solving = True
@@ -11,12 +12,13 @@ def solver(sodoku):
     solutions = dict()
     
     found_first_cell = False
+    starting_cell = 0
     cell = 0
     square = 0
     
     for i in range(9):
         for j in range(9):
-            if sodoku[i][j] == 0:
+            if sodoku[i, j] == 0:
                 solutions[index_to_cell(i, j)] = set()
                 if not(found_first_cell):
                     cell = index_to_cell(i, j)
@@ -50,8 +52,8 @@ def solver(sodoku):
 
             for index in square_cells:
                 c = cell_to_index(index)
-                if sodoku[c[0]][c[1]] != 0:
-                    taken.add(sodoku[c[0]][c[1]])
+                if sodoku[c[0], c[1]] != 0:
+                    taken.add(sodoku[c[0], c[1]])
 
             # Add the solutions to the dictionary
             solutions[cell] = {x for x in range(1, 10)} - taken
@@ -67,14 +69,14 @@ def solver(sodoku):
             
             # If there are no solutions:
             
-            # 1. Clear the cell since the solution is invalid
+            # Clear the cell since the solution is invalid
             c = cell_to_index(cell)
-            sodoku[c[0]][c[1]] = 0
+            sodoku[c[0], c[1]] = 0
             
-            # 2. Remove the cell from the burned set
+            # Remove the cell from the burned set
             burned.remove(cell)
             
-            # 3. Go back to the previous cell
+            # Go back to the previous cell
             ind = list(solutions.keys()).index(cell) - 1
             cell = list(solutions.keys())[ind]
             
@@ -82,23 +84,42 @@ def solver(sodoku):
             
             # If solutions exist:
                       
-            # 1. Set the solution
+            # Set the solution
             c = cell_to_index(cell)
-            sodoku[c[0]][c[1]] = list(solutions[cell])[0]
+            sodoku[c[0], c[1]] = list(solutions[cell])[0]
             
-            # 2. Clear the solution from the set
+            # Clear the solution from the set
             solutions[cell].pop()
             
-            # 3. Find the next empty cell
+            # Find the next empty cell
             ind = list(solutions.keys()).index(cell) + 1
             
-            # 4. Terminate if at the last cell, and continue otherwise
+            # Terminate if at the last cell, continue otherwise
             if ind == len(solutions):
                 
-                solving = False
+                # If we try to terminate with missing solutions, then the sodoku is unsolvable
+                if 0 in sodoku:
+                    
+                    return -1
+                    
+                else:
+                    
+                    solving = False
                 
             else:
             
                 cell = list(solutions.keys())[ind]
         
     return sodoku
+    
+# Function checks to see if a sodoku solution is valid
+def validator(sodoku):
+    
+    for i in range(9):
+        present = set()
+        for j in range(9):
+            present.add(sodoku[i, j])
+        if len(present) != 9:
+            return False
+            
+    return True
