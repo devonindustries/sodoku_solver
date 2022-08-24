@@ -3,7 +3,15 @@ from random import *
 from math import *
 
 # Generate a sodoku with default 30 numbers to begin with
-def generate_sodoku(size=30):
+def generate_sodoku(size=23):
+    '''
+    Generate a blank sodoku. Takes arguments:
+
+    - size : This refers to how many entries the unsolved sodoku should contain. Returns -1 if size exceeds 81.
+    '''
+
+    # Check that the size is not too large
+    if size > 81: return -1
 
     board = np.zeros(shape=(9,9))
     p_board = [[set() for x in range(9)] for y in range(9)]
